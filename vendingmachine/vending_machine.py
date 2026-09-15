@@ -42,10 +42,6 @@ class VendingMachine:
         self.reset()
         self.set_state(IdleState(self))
 
-    def refund_balance(self) -> None:
-        print(f"Refunding: ₹{self.balance}")
-        self.balance = 0
-
     def reset(self) -> None:
         self.selected_item_code = None
         self.balance = 0

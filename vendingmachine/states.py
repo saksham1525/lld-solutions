@@ -22,11 +22,6 @@ class VendingMachineState(ABC):
     def dispense(self):
         """Handle dispense request."""
         pass
-    
-    @abstractmethod
-    def refund(self):
-        """Handle refund request."""
-        pass
 
 
 class IdleState(VendingMachineState):
@@ -46,9 +41,6 @@ class IdleState(VendingMachineState):
     
     def dispense(self):
         print("No item selected.")
-    
-    def refund(self):
-        print("No money to refund.")
 
 
 class ItemSelectedState(VendingMachineState):
@@ -64,15 +56,10 @@ class ItemSelectedState(VendingMachineState):
             self.machine.set_state(HasMoneyState(self.machine))
     
     def select_item(self, code: str):
-        print("Item already selected. Please insert money or request refund to select a different item.")
-    
+        print("Item already selected. Please insert money to select a different item.")
+
     def dispense(self):
         print("Please insert sufficient money.")
-    
-    def refund(self):
-        self.machine.refund_balance()
-        self.machine.reset()
-        self.machine.set_state(IdleState(self.machine))
 
 
 class HasMoneyState(VendingMachineState):
@@ -84,16 +71,11 @@ class HasMoneyState(VendingMachineState):
         print(f"Additional currency inserted: ₹{currency.get_value()} ({currency.name}) - will be returned as change.")
     
     def select_item(self, code: str):
-        print("Item already selected. Please dispense or request refund to select a different item.")
-    
+        print("Item already selected. Please dispense to select a different item.")
+
     def dispense(self):
         self.machine.set_state(DispensingState(self.machine))
         self.machine.dispense_item()
-
-    def refund(self):
-        self.machine.refund_balance()
-        self.machine.reset()
-        self.machine.set_state(IdleState(self.machine))
 
 
 class DispensingState(VendingMachineState):
@@ -108,6 +90,3 @@ class DispensingState(VendingMachineState):
     def dispense(self):
         # Already triggered by HasMoneyState
         print("Dispensing in progress...")
-    
-    def refund(self):
-        print("Dispensing in progress. Refund not allowed.")
