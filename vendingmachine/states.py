@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from currency import Currency
+from money import Money
 
 
 class VendingMachineState(ABC):
@@ -9,8 +9,8 @@ class VendingMachineState(ABC):
         self.machine = machine
     
     @abstractmethod
-    def insert_coin(self, currency: Currency):
-        """Handle currency insertion."""
+    def insert_money(self, money: Money):
+        """Handle money insertion."""
         pass
     
     @abstractmethod
@@ -27,7 +27,7 @@ class VendingMachineState(ABC):
 class IdleState(VendingMachineState):
     """State when machine is waiting for user interaction."""
     
-    def insert_coin(self, currency: Currency):
+    def insert_money(self, money: Money):
         print("Please select an item before inserting money.")
     
     def select_item(self, code: str):
@@ -46,13 +46,14 @@ class IdleState(VendingMachineState):
 class ItemSelectedState(VendingMachineState):
     """State when an item has been selected but insufficient money inserted."""
     
-    def insert_coin(self, currency: Currency):
-        self.machine.add_balance(currency.get_value())
-        print(f"Currency inserted: ₹{currency.get_value()} ({currency.name})")
-        
-        selected_item = self.machine.get_selected_item()
-        if selected_item and self.machine.get_balance() >= selected_item.get_price():
-            print("Sufficient money received.")
+    def insert_money(self, money: Money):
+        price = self.machine.get_selected_item().get_price()
+        value = money.get_value()
+
+        if value != price:
+            print(f"Add Exactly ₹{price}")
+        else:
+            print("Exact amount received.")
             self.machine.set_state(HasMoneyState(self.machine))
     
     def select_item(self, code: str):
@@ -65,10 +66,8 @@ class ItemSelectedState(VendingMachineState):
 class HasMoneyState(VendingMachineState):
     """State when sufficient money has been inserted."""
     
-    def insert_coin(self, currency: Currency):
-        # Allow more currency (will be returned as change)
-        self.machine.add_balance(currency.get_value())
-        print(f"Additional currency inserted: ₹{currency.get_value()} ({currency.name}) - will be returned as change.")
+    def insert_money(self, money: Money):
+        print("Exact amount paid. No more money accepted.")
     
     def select_item(self, code: str):
         print("Item already selected. Please dispense to select a different item.")
@@ -81,7 +80,7 @@ class HasMoneyState(VendingMachineState):
 class DispensingState(VendingMachineState):
     """State when item is being dispensed - blocks all user input."""
     
-    def insert_coin(self, currency: Currency):
+    def insert_money(self, money: Money):
         print("Currently dispensing. Please wait.")
     
     def select_item(self, code: str):

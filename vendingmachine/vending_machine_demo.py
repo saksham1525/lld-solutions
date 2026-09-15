@@ -1,5 +1,5 @@
 from vending_machine import VendingMachine
-from currency import Currency
+from money import Money
 
 class VendingMachineDemo:
     @staticmethod
@@ -15,10 +15,9 @@ class VendingMachineDemo:
         print("\n--- Step 1: Select an item ---")
         vending_machine.select_item("A1")
 
-        # Insert coins
-        print("\n--- Step 2: Insert coins ---")
-        vending_machine.insert_coin(Currency.TEN)  # ₹10
-        vending_machine.insert_coin(Currency.TEN)  # ₹10
+        # Insert exact coin
+        print("\n--- Step 2: Insert exact coin ---")
+        vending_machine.insert_money(Money.TWENTY)  # ₹20, price is ₹20
 
         # Dispense the product
         print("\n--- Step 3: Dispense item ---")
@@ -28,12 +27,20 @@ class VendingMachineDemo:
         print("\n--- Step 4: Select another item ---")
         vending_machine.select_item("B1")
 
-        # Insert more amount
-        print("\n--- Step 5: Insert more than needed ---")
-        vending_machine.insert_coin(Currency.TWENTY)  # ₹20
+        # Try to overpay
+        print("\n--- Step 5: Insert more than needed (should be rejected) ---")
+        vending_machine.insert_money(Money.TWENTY)  # ₹20, price is ₹10
 
-        # Try to dispense the product
-        print("\n--- Step 6: Dispense and return change ---")
+        # Try to underpay
+        print("\n--- Step 6: Insert less than needed (should be rejected) ---")
+        vending_machine.insert_money(Money.FIVE)  # ₹5, price is ₹10
+
+        # Insert exact amount
+        print("\n--- Step 7: Insert exact amount ---")
+        vending_machine.insert_money(Money.TEN)  # ₹10
+
+        # Dispense the product
+        print("\n--- Step 8: Dispense item ---")
         vending_machine.dispense()
 
 

@@ -1,20 +1,25 @@
 # Designing a Vending Machine
 
 ## Requirements
-1. The vending machine should support multiple products with different prices and quantities.
-1. The machine should accept coins and notes of different denominations.
-1. The machine should dispense the selected product and return change if necessary.
-1. The machine should keep track of the available products and their quantities.
-1. The machine should handle multiple transactions concurrently and ensure data consistency.
-1. The machine should provide an interface for restocking products and collecting money.
-1. The machine should handle exceptional scenarios, such as insufficient funds or out-of-stock products.
+1. The machine stocks multiple items, each with a code, name, price, and quantity.
+2. A user selects one item at a time; a second item can't be selected mid-transaction.
+3. Payment must be a single coin that exactly matches the item's price — no change, no partial payment.
+4. On exact payment, the item is dispensed and its stock reduced by one.
 
-## Classes, Interfaces and Enumerations
-1. The **Product** class represents a product in the vending machine, with properties such as name and price.
-2. The **Coin** and **Note** enums represent the different denominations of coins and notes accepted by the vending machine.
-3. The **Inventory** class manages the available products and their quantities in the vending machine. It uses a concurrent hash map to ensure thread safety.
-4. The **VendingMachineState** interface defines the behavior of the vending machine in different states, such as idle, ready, and dispense.
-5. The **IdleState**, **ReadyState**, and **DispenseState** classes implement the VendingMachineState interface and define the specific behaviors for each state.
-6. The **VendingMachine** class is the main class that represents the vending machine. It follows the Singleton pattern to ensure only one instance of the vending machine exists.
-7. The VendingMachine class maintains the current state, selected product, total payment, and provides methods for state transitions and payment handling.
-8. The **VendingMachineDemo** class demonstrates the usage of the vending machine by adding products to the inventory, selecting products, inserting coins and notes, dispensing products, and returning change.
+## Classes and Enumerations
+1. **Money** (`money.py`) — enum of coin/note denominations with `get_value()`.
+2. **Item** (`item.py`) — `code`, `name`, `price`, `quantity`; `is_available()` and `reduce_stock()`.
+3. **VendingMachineState** (`states.py`) — abstract base defining `insert_money`, `select_item`, `dispense`.
+4. **IdleState, ItemSelectedState, HasMoneyState, DispensingState** (`states.py`) — the concrete states: nothing selected → waiting for exact coin/note → exact amount received → dispensing.
+5. **VendingMachine** (`vending_machine.py`) — holds the item inventory and delegates actions to whichever state is `current_state`.
+6. **VendingMachineDemo** (`vending_machine_demo.py`) — selects an item, pays exact, dispenses; then shows a rejected overpay/underpay before a successful second purchase.
+
+## Simplifications made in this implementation
+- No change or partial payment — one coin/note must exactly match the price (an unpayable price, e.g. ₹15, can never be dispensed).
+- No refund flow.
+- No concurrency handling — `DispensingState` is for clarity, not thread safety.
+
+## Running the demo
+```
+python vending_machine_demo.py
+```

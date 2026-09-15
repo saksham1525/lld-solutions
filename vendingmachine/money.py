@@ -1,7 +1,7 @@
 from enum import Enum
 
-class Currency(Enum):
-    """Currency denominations, in rupees"""
+class Money(Enum):
+    """Money denominations, in rupees"""
     ONE = 1
     TWO = 2
     FIVE = 5
