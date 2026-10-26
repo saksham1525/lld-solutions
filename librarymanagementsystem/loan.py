@@ -1,18 +1,13 @@
-from datetime import date
-from typing import TYPE_CHECKING
+from datetime import date, timedelta
 
-if TYPE_CHECKING:
-    from book_copy import BookCopy
-    from member import Member
+LOAN_DAYS = 14
+FINE_PER_DAY = 1
 
 class Loan:
-    def __init__(self, book_copy: 'BookCopy', member: 'Member'):
-        self.copy = book_copy
+    def __init__(self, item, member):
+        self.item = item
         self.member = member
-        self.checkout_date = date.today()
+        self.due_date = date.today() + timedelta(days=LOAN_DAYS)
 
-    def get_copy(self) -> 'BookCopy':
-        return self.copy
-
-    def get_member(self) -> 'Member':
-        return self.member
+    def fine(self, today: date) -> int:
+        return max(0, (today - self.due_date).days) * FINE_PER_DAY

@@ -1,51 +1,41 @@
-from typing import List, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from member import Member
-    from book_copy import BookCopy
+from datetime import date
+from loan import Loan
+from member import Member
+from states import ItemState, AvailableState
 
 class LibraryItem:
-    """A catalog entry (e.g. a book or magazine title). Copies are the physical units members borrow."""
+    """A single physical book/magazine."""
 
-    def __init__(self, item_id: str, title: str, author_or_publisher: str):
+    def __init__(self, item_id: str, title: str, author: str):
         self.id = item_id
         self.title = title
-        self.author_or_publisher = author_or_publisher
-        self.copies: List['BookCopy'] = []
-        self.observers: List['Member'] = []  # Observer pattern: members waiting for a copy to free up
+        self.author = author
+        self.current_state: ItemState = AvailableState(self)
+        self.current_loan: Loan | None = None
 
-    def add_copy(self, book_copy: 'BookCopy') -> None:
-        self.copies.append(book_copy)
+    # --- Public API, delegated to the current state ---
 
-    def add_observer(self, member: 'Member') -> None:
-        self.observers.append(member)
+    def checkout(self, member: Member) -> None:
+        self.current_state.checkout(member)
 
-    def remove_observer(self, member: 'Member') -> None:
-        if member in self.observers:
-            self.observers.remove(member)
+    def return_item(self, today: date) -> None:
+        self.current_state.return_item(today)
 
-    def notify_observers(self) -> None:
-        print(f"Notifying {len(self.observers)} observers for '{self.title}'...")
-        for observer in self.observers.copy():  # copy() so removing a hold mid-loop is safe
-            observer.update(self)
+    def is_available(self) -> bool:
+        return self.current_loan is None
 
-    def get_available_copy_count(self) -> int:
-        return sum(1 for copy in self.copies if copy.is_available())
+    # --- Internals used by ItemState subclasses ---
 
-    def has_observers(self) -> bool:
-        return len(self.observers) > 0
+    def set_state(self, state: ItemState) -> None:
+        self.current_state = state
 
-    def is_observer(self, member: 'Member') -> bool:
-        return member in self.observers
+    def start_loan(self, member: Member) -> Loan:
+        self.current_loan = Loan(self, member)
+        member.add_loan(self.current_loan)
+        return self.current_loan
 
-    def get_id(self) -> str:
-        return self.id
-
-    def get_title(self) -> str:
-        return self.title
-
-    def get_author_or_publisher(self) -> str:
-        return self.author_or_publisher
-
-    def get_copies(self) -> List['BookCopy']:
-        return self.copies
+    def end_loan(self) -> Loan:
+        loan = self.current_loan
+        loan.member.remove_loan(loan)
+        self.current_loan = None
+        return loan

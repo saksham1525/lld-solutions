@@ -11,11 +11,10 @@
 8. The system should be extensible to accommodate future enhancements and new features.
 
 ## Classes, Interfaces and Enumerations
-1. **LibraryItem** is a catalog entry (a title, e.g. "Dune") with an author/publisher and a list of physical `BookCopy` instances. Book vs. magazine is just data here (no behavioral difference), so there's a single class rather than subclasses per type.
-2. **BookCopy** is the physical unit a member actually borrows. It holds an `ItemState` (State pattern) that governs what actions are legal on it.
-3. **ItemState** (`AvailableState` / `CheckedOutState` / `OnHoldState`) encodes checkout/return/hold rules per state, so `BookCopy` doesn't need a pile of `if` statements to check what's currently allowed.
-4. **Member** represents a library member and tracks their active `Loan`s. It's also the Observer in the Observer pattern below (`update()`).
-5. `LibraryItem` is the Subject in an Observer pattern: members can `place_hold` on a checked-out item and are notified (`notify_observers`) when a copy is returned.
-6. **SearchStrategy** (Strategy pattern) lets `LibraryManagementSystem.search()` take a pluggable search algorithm (`SearchByTitleStrategy`, `SearchByAuthorStrategy`) instead of hardcoding one.
-7. **LibraryManagementSystem** is a plain facade over the catalog, members, and copies — it's instantiated directly by the caller (no Singleton), the way `ParkingLot`/`VendingMachine` are in the sibling projects.
-8. **LibraryManagementSystemDemo** is the entry point and walks through searching, checkout/return, and holds.
+1. **LibraryItem** is a single physical book/magazine (one item = one copy). It holds an `ItemState` (State pattern) and its current `Loan`.
+2. **ItemState** in `states.py` (`AvailableState` / `CheckedOutState`) takes the item in its constructor, like the vending machine states, and encodes checkout/return rules per state. Checkout enforces `MAX_BOOKS_PER_MEMBER`; return computes the overdue fine.
+3. **Loan** links an item to a member, with a `due_date` (`LOAN_DAYS` after checkout) and a `fine()` of `FINE_PER_DAY` per day late.
+4. **Member** has a name, id, and active `Loan`s.
+5. **SearchStrategy** (Strategy pattern) lets `search()` take a pluggable algorithm (`SearchByTitleStrategy`, `SearchByAuthorStrategy`).
+6. **LibraryManagementSystem** is a plain facade over the items and members (no Singleton). Requirement 7 (concurrency) is explained in a comment there but not implemented.
+7. **LibraryManagementSystemDemo** walks through search, checkout/return, the borrowing limit, and a fine.

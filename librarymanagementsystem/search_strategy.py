@@ -1,16 +1,15 @@
 from abc import ABC, abstractmethod
-from typing import List
 from library_item import LibraryItem
 
 class SearchStrategy(ABC):
     @abstractmethod
-    def search(self, query: str, items: List[LibraryItem]) -> List[LibraryItem]:
+    def search(self, query: str, items: list[LibraryItem]) -> list[LibraryItem]:
         pass
 
 class SearchByTitleStrategy(SearchStrategy):
-    def search(self, query: str, items: List[LibraryItem]) -> List[LibraryItem]:
-        return [item for item in items if query.lower() in item.get_title().lower()]
+    def search(self, query: str, items: list[LibraryItem]) -> list[LibraryItem]:
+        return [item for item in items if query.lower() in item.title.lower()]
 
 class SearchByAuthorStrategy(SearchStrategy):
-    def search(self, query: str, items: List[LibraryItem]) -> List[LibraryItem]:
-        return [item for item in items if query.lower() in item.get_author_or_publisher().lower()]
+    def search(self, query: str, items: list[LibraryItem]) -> list[LibraryItem]:
+        return [item for item in items if query.lower() in item.author.lower()]
