@@ -23,16 +23,16 @@ class LibraryManagementDemo:
 
         print("\n=== Checkout and Return (State) ===")
         library.checkout("MEM01", "B001")
-        library.checkout("MEM02", "B001")  # already checked out
+        library.checkout("MEM02", "B001")  # fails: already checked out
         library.return_item("B001")
-        library.return_item("B001")        # not checked out
+        library.return_item("B001")        # fails: not checked out
 
         print("\n=== Borrowing limit ===")
         for item_id in ["B001", "B002", "B003", "B004"]:
-            library.checkout("MEM01", item_id)  # 4th fails
+            library.checkout("MEM01", item_id)  # 4th fails: limit is 3
 
         print("\n=== Overdue fine ===")
-        library.return_item("B002", today=date.today() + timedelta(days=17))  # 3 days late
+        library.return_item("B002", today=date.today() + timedelta(days=17))  # returned 3 days late
         library.print_catalog()
 
 if __name__ == "__main__":

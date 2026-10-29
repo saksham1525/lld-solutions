@@ -6,6 +6,7 @@ class Member:
     def __init__(self, member_id: str, name: str):
         self.id = member_id
         self.name = name
+        # the loans this member currently has (not returned yet)
         self.loans: list[Loan] = []
 
     def can_borrow(self) -> bool:
