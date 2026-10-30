@@ -3,10 +3,8 @@ from library_item import LibraryItem
 from member import Member
 from search_strategy import SearchStrategy
 
-# Concurrency: two members can call checkout() on the same item at the same time.
-# Both could see AvailableState and both "win", so one item ends up on two loans.
-# The state check + state change must be atomic, e.g. a threading.Lock per item
-# (or one lock in this facade). Not implemented here to keep the logic simple.
+# Concurrency: if two members check out the same item at once, both can see it as
+# available and both get it. Fix: a lock per item around checkout/return (not added here).
 class LibraryManagementSystem:
     def __init__(self):
         self.items: dict[str, LibraryItem] = {}
@@ -48,8 +46,6 @@ class LibraryManagementSystem:
         return strategy.search(query, list(self.items.values()))
 
     def print_catalog(self) -> None:
-        print("\n--- Library Catalog ---")
         for item in self.items.values():
             status = "Available" if item.is_available() else "Checked out"
             print(f"ID: {item.id}, Title: {item.title}, Author: {item.author}, {status}")
-        print("-----------------------\n")
