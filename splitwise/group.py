@@ -6,15 +6,15 @@ if TYPE_CHECKING:
 
 class Group:
     def __init__(self, name: str, members: List['User']):
-        self._id = str(uuid.uuid4())
-        self._name = name
-        self._members = members
+        self.id = str(uuid.uuid4())
+        self.name = name
+        self.members = members
     
     def get_id(self) -> str:
-        return self._id
+        return self.id
     
     def get_name(self) -> str:
-        return self._name
+        return self.name
     
     def get_members(self) -> List['User']:
-        return self._members.copy()
+        return self.members.copy()

@@ -7,21 +7,21 @@ from transaction import Transaction
 
 class SplitwiseService:
     _instance = None
-    _lock = threading.Lock()
+    lock = threading.Lock()
     
     def __new__(cls):
         if cls._instance is None:
-            with cls._lock:
+            with cls.lock:
                 if cls._instance is None:
                     cls._instance = super().__new__(cls)
-                    cls._instance._initialized = False
+                    cls._instance.initialized = False
         return cls._instance
     
     def __init__(self):
-        if not self._initialized:
-            self._users: Dict[str, User] = {}
-            self._groups: Dict[str, Group] = {}
-            self._initialized = True
+        if not self.initialized:
+            self.users: Dict[str, User] = {}
+            self.groups: Dict[str, Group] = {}
+            self.initialized = True
     
     @classmethod
     def get_instance(cls):
@@ -29,22 +29,22 @@ class SplitwiseService:
     
     def add_user(self, name: str, email: str) -> User:
         user = User(name, email)
-        self._users[user.get_id()] = user
+        self.users[user.get_id()] = user
         return user
     
     def add_group(self, name: str, members: List[User]) -> Group:
         group = Group(name, members)
-        self._groups[group.get_id()] = group
+        self.groups[group.get_id()] = group
         return group
     
     def get_user(self, user_id: str) -> Optional[User]:
-        return self._users.get(user_id)
+        return self.users.get(user_id)
     
     def get_group(self, group_id: str) -> Optional[Group]:
-        return self._groups.get(group_id)
+        return self.groups.get(group_id)
     
     def create_expense(self, builder: Expense.ExpenseBuilder):
-        with self._lock:
+        with self.lock:
             expense = builder.build()
             paid_by = expense.get_paid_by()
             
@@ -59,9 +59,9 @@ class SplitwiseService:
             print(f"Expense '{expense.get_description()}' of amount {expense.get_amount()} created.")
     
     def settle_up(self, payer_id: str, payee_id: str, amount: float):
-        with self._lock:
-            payer = self._users[payer_id]
-            payee = self._users[payee_id]
+        with self.lock:
+            payer = self.users[payer_id]
+            payee = self.users[payee_id]
             print(f"{payer.get_name()} is settling up {amount} with {payee.get_name()}")
             
             # Settlement is like a reverse expense. payer owes less to payee.
@@ -69,11 +69,11 @@ class SplitwiseService:
             payer.get_balance_sheet().adjust_balance(payee, amount)
     
     def show_balance_sheet(self, user_id: str):
-        user = self._users[user_id]
+        user = self.users[user_id]
         user.get_balance_sheet().show_balances()
     
     def simplify_group_debts(self, group_id: str) -> List[Transaction]:
-        group = self._groups.get(group_id)
+        group = self.groups.get(group_id)
         if group is None:
             raise ValueError("Group not found")
         

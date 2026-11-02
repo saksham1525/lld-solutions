@@ -6,71 +6,71 @@ from split_strategy import SplitStrategy
 
 class Expense:
     def __init__(self, builder: 'ExpenseBuilder'):
-        self._id = builder._id
-        self._description = builder._description
-        self._amount = builder._amount
-        self._paid_by = builder._paid_by
-        self._timestamp = datetime.now()
+        self.id = builder.id
+        self.description = builder.description
+        self.amount = builder.amount
+        self.paid_by = builder.paid_by
+        self.timestamp = datetime.now()
         
         # Use the strategy to calculate splits
-        self._splits = builder._split_strategy.calculate_splits(
-            builder._amount, builder._paid_by, builder._participants, builder._split_values
+        self.splits = builder.split_strategy.calculate_splits(
+            builder.amount, builder.paid_by, builder.participants, builder.split_values
         )
     
     def get_id(self) -> str:
-        return self._id
+        return self.id
     
     def get_description(self) -> str:
-        return self._description
+        return self.description
     
     def get_amount(self) -> float:
-        return self._amount
+        return self.amount
     
     def get_paid_by(self) -> User:
-        return self._paid_by
+        return self.paid_by
     
     def get_splits(self) -> List[Split]:
-        return self._splits
+        return self.splits
     
     class ExpenseBuilder:
         def __init__(self):
-            self._id: Optional[str] = None
-            self._description: Optional[str] = None
-            self._amount: Optional[float] = None
-            self._paid_by: Optional[User] = None
-            self._participants: Optional[List[User]] = None
-            self._split_strategy: Optional[SplitStrategy] = None
-            self._split_values: Optional[List[float]] = None
+            self.id: Optional[str] = None
+            self.description: Optional[str] = None
+            self.amount: Optional[float] = None
+            self.paid_by: Optional[User] = None
+            self.participants: Optional[List[User]] = None
+            self.split_strategy: Optional[SplitStrategy] = None
+            self.split_values: Optional[List[float]] = None
         
         def set_id(self, expense_id: str) -> 'Expense.ExpenseBuilder':
-            self._id = expense_id
+            self.id = expense_id
             return self
         
         def set_description(self, description: str) -> 'Expense.ExpenseBuilder':
-            self._description = description
+            self.description = description
             return self
         
         def set_amount(self, amount: float) -> 'Expense.ExpenseBuilder':
-            self._amount = amount
+            self.amount = amount
             return self
         
         def set_paid_by(self, paid_by: User) -> 'Expense.ExpenseBuilder':
-            self._paid_by = paid_by
+            self.paid_by = paid_by
             return self
         
         def set_participants(self, participants: List[User]) -> 'Expense.ExpenseBuilder':
-            self._participants = participants
+            self.participants = participants
             return self
         
         def set_split_strategy(self, split_strategy: SplitStrategy) -> 'Expense.ExpenseBuilder':
-            self._split_strategy = split_strategy
+            self.split_strategy = split_strategy
             return self
         
         def set_split_values(self, split_values: List[float]) -> 'Expense.ExpenseBuilder':
-            self._split_values = split_values
+            self.split_values = split_values
             return self
         
         def build(self) -> 'Expense':
-            if self._split_strategy is None:
+            if self.split_strategy is None:
                 raise ValueError("Split strategy is required.")
             return Expense(self)
